@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Mediation Widget</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🤝 AI Negotiation Mediator</h1>
+        <p class="subtitle">AI monitors for inappropriate language in real-time</p>
+        
+        <div class="ai-status" id="aiStatus">
+            AI Mediator: Ready and monitoring
+        </div>
+
+        <div class="chat-area">
+            <div class="participant">
+                <div class="participant-header alice-header">👤 Alice</div>
+                <div class="messages" id="aliceMessages"></div>
+                <div class="input-area">
+                    <input type="text" id="aliceInput" placeholder="Type your message..." />
+                    <button onclick="sendMessage('alice')">Send</button>
+                </div>
+            </div>
+
+            <div class="participant">
+                <div class="participant-header bob-header">👤 Bob</div>
+                <div class="messages" id="bobMessages"></div>
+                <div class="input-area">
+                    <input type="text" id="bobInput" placeholder="Type your message..." />
+                    <button onclick="sendMessage('bob')">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="warningModal">
+        <div class="modal-content">
+            <h2>⚠️ No Curse Words!</h2>
+            <p>Please keep the conversation professional and respectful.</p>
+            <button onclick="closeModal()">Understood</button>
+        </div>
+    </div>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

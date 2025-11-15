@@ -1,0 +1,18 @@
+{
+  "name": "ai_mediation_website",
+  "version": "1.0.0",
+  "description": "An AI-powered widget that monitors conversations between two parties and intervenes when inappropriate language is detected.",
+  "main": "script.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "vite": "^7.2.2"
+  }
+}
