@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🤝 AI Negotiation Mediator</h1>
+        <h1>AI Negotiation Mediator</h1>
         <p class="subtitle">AI monitors for inappropriate language in real-time</p>
         
         <div class="ai-status" id="aiStatus">
@@ -19,8 +19,12 @@
             <div class="participant">
                 <div class="participant-header alice-header">👤 Alice</div>
                 <div class="messages" id="aliceMessages"></div>
+                <div class="transcript-indicator" id="aliceTranscript"></div>
                 <div class="input-area">
-                    <input type="text" id="aliceInput" placeholder="Type your message..." />
+                    <button class="mic-button" id="aliceMicBtn" onclick="toggleRecording('alice')">
+                        🎤
+                    </button>
+                    <input type="text" id="aliceInput" placeholder="Type or use microphone..." />
                     <button onclick="sendMessage('alice')">Send</button>
                 </div>
             </div>
@@ -28,8 +32,12 @@
             <div class="participant">
                 <div class="participant-header bob-header">👤 Bob</div>
                 <div class="messages" id="bobMessages"></div>
+                <div class="transcript-indicator" id="bobTranscript"></div>
                 <div class="input-area">
-                    <input type="text" id="bobInput" placeholder="Type your message..." />
+                    <button class="mic-button" id="bobMicBtn" onclick="toggleRecording('bob')">
+                        🎤
+                    </button>
+                    <input type="text" id="bobInput" placeholder="Type or use microphone..." />
                     <button onclick="sendMessage('bob')">Send</button>
                 </div>
             </div>
@@ -38,7 +46,7 @@
 
     <div class="modal" id="warningModal">
         <div class="modal-content">
-            <h2>⚠️ No Curse Words!</h2>
+            <h2>No Curse Words!</h2>
             <p>Please keep the conversation professional and respectful.</p>
             <button onclick="closeModal()">Understood</button>
         </div>

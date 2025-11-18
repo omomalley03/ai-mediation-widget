@@ -14,6 +14,186 @@ bobInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage('bob');
 });
 
+
+// Add these new variables at the top with your other variables
+const aliceMicBtn = document.getElementById('aliceMicBtn');
+const bobMicBtn = document.getElementById('bobMicBtn');
+const aliceTranscript = document.getElementById('aliceTranscript');
+const bobTranscript = document.getElementById('bobTranscript');
+
+// Speech recognition setup
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let aliceRecognition = null;
+let bobRecognition = null;
+let isAliceRecording = false;
+let isBobRecording = false;
+
+// Check if speech recognition is supported
+if (SpeechRecognition) {
+    aliceRecognition = new SpeechRecognition();
+    bobRecognition = new SpeechRecognition();
+
+    // Configure both recognitions
+    [aliceRecognition, bobRecognition].forEach(recognition => {
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+    });
+
+    // Alice's speech recognition
+    aliceRecognition.onresult = (event) => handleSpeechResult(event, 'alice');
+    aliceRecognition.onerror = (event) => handleSpeechError(event, 'alice');
+    aliceRecognition.onend = () => handleSpeechEnd('alice');
+
+    // Bob's speech recognition
+    bobRecognition.onresult = (event) => handleSpeechResult(event, 'bob');
+    bobRecognition.onerror = (event) => handleSpeechError(event, 'bob');
+    bobRecognition.onend = () => handleSpeechEnd('bob');
+} else {
+    console.warn('Speech recognition not supported in this browser');
+    if (aliceMicBtn) aliceMicBtn.disabled = true;
+    if (bobMicBtn) bobMicBtn.disabled = true;
+    if (aliceMicBtn) aliceMicBtn.title = 'Speech recognition not supported';
+    if (bobMicBtn) bobMicBtn.title = 'Speech recognition not supported';
+}
+
+// Speech recognition functions
+function toggleRecording(sender) {
+    if (sender === 'alice') {
+        if (isAliceRecording) {
+            stopRecording('alice');
+        } else {
+            startRecording('alice');
+        }
+    } else {
+        if (isBobRecording) {
+            stopRecording('bob');
+        } else {
+            startRecording('bob');
+        }
+    }
+}
+
+function startRecording(sender) {
+    const recognition = sender === 'alice' ? aliceRecognition : bobRecognition;
+    const micBtn = sender === 'alice' ? aliceMicBtn : bobMicBtn;
+    const input = sender === 'alice' ? aliceInput : bobInput;
+    const transcriptDiv = sender === 'alice' ? aliceTranscript : bobTranscript;
+
+    if (!recognition) return;
+
+    try {
+        recognition.start();
+        if (sender === 'alice') {
+            isAliceRecording = true;
+        } else {
+            isBobRecording = true;
+        }
+        
+        micBtn.classList.add('recording');
+        micBtn.textContent = '⏹️';
+        input.placeholder = 'Listening...';
+        input.disabled = true;
+        transcriptDiv.textContent = 'Listening...';
+        transcriptDiv.classList.add('active');
+        
+        console.log(`${sender} started recording`);
+    } catch (error) {
+        console.error('Error starting recognition:', error);
+    }
+}
+
+function stopRecording(sender) {
+    const recognition = sender === 'alice' ? aliceRecognition : bobRecognition;
+    const micBtn = sender === 'alice' ? aliceMicBtn : bobMicBtn;
+    const input = sender === 'alice' ? aliceInput : bobInput;
+    const transcriptDiv = sender === 'alice' ? aliceTranscript : bobTranscript;
+
+    if (!recognition) return;
+
+    try {
+        recognition.stop();
+        if (sender === 'alice') {
+            isAliceRecording = false;
+        } else {
+            isBobRecording = false;
+        }
+
+        micBtn.classList.remove('recording');
+        micBtn.textContent = '🎤';
+        input.disabled = false;
+        input.placeholder = 'Type or use microphone...';
+        transcriptDiv.classList.remove('active');
+
+        // Auto-send the message after stopping
+        setTimeout(() => {
+            if (input.value.trim()) {
+                sendMessage(sender);
+            }
+            transcriptDiv.textContent = '';
+        }, 100);
+
+        console.log(`${sender} stopped recording`);
+    } catch (error) {
+        console.error('Error stopping recognition:', error);
+    }
+}
+
+function handleSpeechResult(event, sender) {
+    const input = sender === 'alice' ? aliceInput : bobInput;
+    const transcriptDiv = sender === 'alice' ? aliceTranscript : bobTranscript;
+    
+    let finalTranscript = '';
+    let interimTranscript = '';
+
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+            finalTranscript += transcript + ' ';
+        } else {
+            interimTranscript += transcript;
+        }
+    }
+
+    if (finalTranscript) {
+        input.value = (input.value + ' ' + finalTranscript).trim();
+    }
+
+    // Show interim results
+    if (interimTranscript) {
+        transcriptDiv.textContent = 'Hearing: "' + interimTranscript + '"';
+    }
+}
+
+function handleSpeechError(event, sender) {
+    console.error(`Speech recognition error for ${sender}:`, event.error);
+    const transcriptDiv = sender === 'alice' ? aliceTranscript : bobTranscript;
+    
+    if (event.error === 'no-speech') {
+        transcriptDiv.textContent = 'No speech detected. Try again.';
+    } else if (event.error === 'not-allowed') {
+        transcriptDiv.textContent = 'Microphone access denied';
+    } else {
+        transcriptDiv.textContent = `Error: ${event.error}`;
+    }
+    
+    stopRecording(sender);
+}
+
+function handleSpeechEnd(sender) {
+    const isRecording = sender === 'alice' ? isAliceRecording : isBobRecording;
+    
+    // If we're supposed to be recording but it ended, restart it
+    if (isRecording) {
+        const recognition = sender === 'alice' ? aliceRecognition : bobRecognition;
+        try {
+            recognition.start();
+        } catch (error) {
+            console.log('Recognition restart not needed');
+        }
+    }
+}
+
 async function sendMessage(sender) {
     const input = sender === 'alice' ? aliceInput : bobInput;
     const messagesDiv = sender === 'alice' ? aliceMessages : bobMessages;

@@ -234,3 +234,53 @@ button:active {
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+
+/* Microphone button styles */
+.mic-button {
+    background: #10b981;
+    min-width: 50px;
+    justify-content: center;
+    padding: 12px 16px;
+}
+
+.mic-button:hover {
+    background: #059669;
+}
+
+.mic-button.recording {
+    background: #ef4444;
+    animation: pulse 1.5s infinite;
+}
+
+.mic-button.recording:hover {
+    background: #dc2626;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Transcript indicator */
+.transcript-indicator {
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    min-height: 18px;
+}
+
+.transcript-indicator.active {
+    color: #ef4444;
+}
+
+/* Update input disabled state */
+input[type="text"]:disabled {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+}
