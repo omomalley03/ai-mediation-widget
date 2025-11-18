@@ -315,19 +315,3 @@ input[type="text"]:disabled {
 .navbar li a:hover {
     opacity: 0.7;
 }
-.reset-btn {
-    background: #ff5252;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 6px;
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-.reset-btn:hover {
-    background: #ff2f2f;
-}
-.mediator-message {
-    background: #fff4c3;
-}

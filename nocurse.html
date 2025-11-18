@@ -4,9 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Mediation Widget</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles_nocurse.css">
 </head>
 <body>
+
+    <nav class="navbar">
+        <ul>
+            <li><a href="nocurse.html">Curse Detection</a></li>
+            <li><a href="mediator.html">Mediator</a></li>
+        </ul>
+    </nav>
+
+
     <div class="container">
         <h1>AI Negotiation Mediator</h1>
         <p class="subtitle">AI monitors for inappropriate language in real-time</p>
@@ -46,12 +55,13 @@
 
     <div class="modal" id="warningModal">
         <div class="modal-content">
-            <h2>No Curse Words!</h2>
-            <p>Please keep the conversation professional and respectful.</p>
+            <h2>⚠️ Warning</h2>
+            <p id="modalMessage">Please keep the conversation professional.</p>
             <button onclick="closeModal()">Understood</button>
         </div>
     </div>
+    <script> window.PAGE_VERSION = "nocurse" </script>
     <script src="config.js"></script>
-    <script src="script.js"></script>
+    <script src="script_nocurse.js"></script>
 </body>
 </html>
