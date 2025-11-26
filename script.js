@@ -224,79 +224,55 @@ async function sendMessage(sender) {
 
 async function mediateLLM(message, sender) {
     console.log('🤖 Starting AI check for message:', message);
-    const systemPrompt = 'You are an AI mediator monitoring a conversation between Alice and Bob on a polarizing political topic. At each turn, you receive the current dialogue and must output exactly one of two things: “[silence]” if no mediation is needed, or “[prompt]: <your facilitating prompt>” if intervention would improve the discussion. If the conversation is empty (no messages yet), you must begin by briefly stating ground rules—respect, turn-taking, and a focus on understanding rather than winning—and then invite Alice to start; this initial output must use the “[prompt]: …” format. After the conversation begins, you should output “[prompt]” when the discussion becomes hostile or personal (insults, contempt, personal attacks), when one person dominates and the other is not being heard, when Alice and Bob misunderstand or talk past each other, when emotions escalate and clarity drops, when the discussion becomes stuck or circular, or when misinterpretation or unclear terminology needs correction. A facilitation prompt should be brief, neutral, and aimed at restoring respect, balance, clarity, or shared understanding. You should output “[silence]” when the conversation is respectful, balanced, calm, and progressing constructively on its own, or when a pause would be productive. The default is silence unless there is a clear reason to intervene. Your output must always be exactly “[silence]” or “[prompt]: <message>” with no additional commentary.';
-    // Update status
+
+    // Update UI
     aiStatus.className = 'ai-status analyzing';
     aiStatus.innerHTML = 'AI Mediator: Analyzing message<span class="loading"></span>';
 
     try {
-        console.log('📡 Making API request to OpenAI...');
-        
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${OPENAI_API_KEY}`
-            },
-            body: JSON.stringify({
-                model: 'gpt-5.1',
-                messages: [{
-                    role: 'system',
-                    content: systemPrompt
+        console.log("📡 Sending dialogue to server backend...");
 
-                }, {
-                    role: 'user',
-                    content: `Dialogue:\n${conversationLog}.`
-                }],
-                temperature: 1,
-                max_completion_tokens: 100
+        // Only send the conversation log (safe)
+        const response = await fetch("http://localhost:3000/api/mediate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                dialogue: conversationLog   // backend will add system prompt + model
             })
         });
 
-        console.log('📥 Response status:', response.status);
+        console.log("📥 Response status:", response.status);
 
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('❌ API Error Response:', errorText);
-            throw new Error(`API returned ${response.status}: ${errorText}`);
+            const text = await response.text();
+            console.error("❌ Server responded with error:", text);
+            throw new Error(`Backend returned ${response.status}`);
         }
 
         const data = await response.json();
-        console.log('✅ API Response data:', data);
-        
-        const aiResponse = data.choices[0].message.content.trim().toUpperCase();
-        const mediatorOutput = data.choices[0].message.content.trim();
+        const mediatorOutput = data.output.trim();
+        console.log("✅ Backend Output:", mediatorOutput);
 
-
-
+        // === Process mediation logic ===
         if (!mediatorOutput.startsWith("[silence]")) {
             const cleaned = mediatorOutput.replace("[prompt]:", "").trim();
 
             aliceMessages.appendChild(makeMediatorBubble(cleaned));
             bobMessages.appendChild(makeMediatorBubble(cleaned));
-
             showModal(cleaned);
 
             aiStatus.textContent = "AI Mediator: Intervention issued";
             conversationLog += `Mediator: ${cleaned}\n`;
-
         } else {
             aiStatus.textContent = "AI Mediator: No intervention needed";
         }
 
-
-
-        console.log('Current conversation log: '+conversationLog)
-        console.log('🔍 AI Decision:', aiResponse);
-        console.log('🔍 Raw AI response:', data.choices[0].message.content);
-
+        console.log("📜 Updated conversation log:\n" + conversationLog);
 
     } catch (error) {
-        console.error('💥 AI check error:', error);
-        console.error('💥 Error details:', error.message);
-        
-        aiStatus.className = 'ai-status';
-        aiStatus.textContent = 'AI Mediator: ❌ Error - Check console';
+        console.error("💥 AI check error:", error);
+        aiStatus.className = "ai-status";
+        aiStatus.textContent = "AI Mediator: ❌ Error - Check console";
     }
 }
 

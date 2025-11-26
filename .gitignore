@@ -2,8 +2,8 @@
 
 # API Keys and Secrets
 config.js
-.env
 *.key
+backend/.env
 
 # Dependencies
 node_modules/
